@@ -5,20 +5,36 @@ set () {
 	# The file ID of a file is its inode index.
   FILE_ID="$( ls -iL "$1" | awk '{print $1}' )"
 
-	# $@ will now comprise only 'notes'
+	# After 'shift', $@ will comprise only the notes
+	# provided at the command line.
 	shift
 
 	echo "$FILE_ID" "$@" >> "$FILE_ANNOTATIONS"
 }
 
+# Usage: note read <filename>
 read () {
   FILE_ID="$( ls -iL "$1" | awk '{print $1}' )"
-
 	cat "$FILE_ANNOTATIONS" | awk "/$FILE_ID/" | cut -d" " -f2-
 }
 
+# alias for note-read
 get () {
   read "$1"
+}
+
+# Writes to the console the annotations of the files in the current directory.
+# The performance of this function is slow, so consider making the implementation
+# more efficient.
+check-directory () {
+	for FILE in *; do
+		NOTE="$(note read $FILE)"
+		if [ -n "$NOTE" ]; then
+
+			# The '-e' option enables interpretation of backslash escapes, including '\n'.
+			echo -e "$NOTE\n  <-- $FILE"
+		fi
+	done
 }
 
 help () {

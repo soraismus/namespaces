@@ -1,0 +1,26 @@
+set () {
+	# $HOME/.file-annotations maps file IDs to annotations.
+	# This script requires the arguments (filename, ...notes)
+
+	# The file ID of a file is its inode index.
+  FILE_ID="$( ls -iL "$1" | awk '{print $1}' )"
+
+	# $@ will now comprise only 'notes'
+	shift
+
+	echo "$FILE_ID" "$@" >> "$FILE_ANNOTATIONS"
+}
+
+read () {
+  FILE_ID="$( ls -iL "$1" | awk '{print $1}' )"
+
+	cat "$FILE_ANNOTATIONS" | awk "/$FILE_ID/" | cut -d" " -f2-
+}
+
+get () {
+  read "$1"
+}
+
+help () {
+  /usr/local/scripts/listfns "$NAMESPACES/note"
+}

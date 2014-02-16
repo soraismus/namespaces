@@ -1,9 +1,8 @@
+# $HOME/.file-annotations maps file IDs to annotations.
+# Usage: note set <filename> <note1> [<note2>, ...]
 set () {
-	# $HOME/.file-annotations maps file IDs to annotations.
-	# This script requires the arguments (filename, ...notes)
-
 	# The file ID of a file is its inode index.
-  FILE_ID="$( ls -iL "$1" | awk '{print $1}' )"
+	FILE_ID="$( get-file-id "$1" )"
 
 	# After 'shift', $@ will comprise only the notes
 	# provided at the command line.
@@ -14,7 +13,7 @@ set () {
 
 # Usage: note read <filename>
 read () {
-  FILE_ID="$( ls -iL "$1" | awk '{print $1}' )"
+	FILE_ID="$( get-file-id "$1" )"
 	cat "$FILE_ANNOTATIONS" | awk "/$FILE_ID/" | cut -d" " -f2-
 }
 
@@ -35,6 +34,19 @@ check-directory () {
 			echo -e "$NOTE\n  <-- $FILE"
 		fi
 	done
+}
+
+get-file-id () {
+	# The '-d' flag of '[' determines whether the file is a directory.
+	# The '-d' flag of 'ls' lists directory entries rather than directory contents.
+	# The '-i' flag prints the inode number for each file.
+	# The '-L' flag dereferences symbolic links.
+	if [ -d "$1" ]; then
+		FILE_ID="$( ls -diL "$1" | awk '{print $1}' )"
+	else
+		FILE_ID="$( ls -iL "$1" | awk '{print $1}' )"
+	fi
+	echo "$FILE_ID"
 }
 
 help () {

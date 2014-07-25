@@ -24,6 +24,8 @@ all () {
   ls -l "$MARKPATH" | awk '!/total/ {printf("%-10s%-5s%s\n", $9, $10, $11)}'
 }
 
+# Unsetting a mark that had been set by `link --var BASH_VARIABLE MARK`
+# does not delete the BASH_VARIABLE that was created by `link`.
 link () {
 
   if [[ $# = 2 || $# = 3 ]]; then

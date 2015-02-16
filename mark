@@ -1,23 +1,23 @@
 set () {
   SETPATH="$(pwd)"
-	
-	if [ -z "$MARKPATH" ]; then
-		exit 1
-	elif [ ! -e "$MARKPATH" ]; then
-	  mkdir -p "$MARKPATH"
-	fi
+  
+  if [ -z "$MARKPATH" ]; then
+    exit 1
+  elif [ ! -e "$MARKPATH" ]; then
+    mkdir -p "$MARKPATH"
+  fi
 
   # The current directory shouldn't traverse $HOME/.marks
-	# Refactor with bash string-processing utilities!
+  # Refactor with bash string-processing utilities!
   echo "$(pwd)" | if grep "\.marks" >/dev/null; then
-	  CUT="$( echo "$(pwd)" | awk -F'.marks' '{print $2}' )"
-		MARK="$( echo "$CUT" | awk -F'/' '{print $2}' )"
-		LEAF="$(echo "$CUT" | cut -d'/' -f3- )"
-		EXPANDED="$( ls -l "/home/theo/.marks/$MARK" | awk '{print $11}' )"
-		ln -s "$EXPANDED/$LEAF" "$MARKPATH/$1"
-	else
-	  ln -s "$SETPATH" "$MARKPATH/$1"
-	fi
+    CUT="$( echo "$(pwd)" | awk -F'.marks' '{print $2}' )"
+    MARK="$( echo "$CUT" | awk -F'/' '{print $2}' )"
+    LEAF="$(echo "$CUT" | cut -d'/' -f3- )"
+    EXPANDED="$( ls -l "/home/theo/.marks/$MARK" | awk '{print $11}' )"
+    ln -s "$EXPANDED/$LEAF" "$MARKPATH/$1"
+  else
+    ln -s "$SETPATH" "$MARKPATH/$1"
+  fi
 }
 
 unset () {
@@ -33,23 +33,23 @@ all () {
 link () {
 
   if [[ $# = 2 || $# = 3 ]]; then
-	  if [[ "$1" = --var ]]; then
-		  echo "export $2=$(pwd)" >> "$HOME/.bash_volatile_exports"
+    if [[ "$1" = --var ]]; then
+      echo "export $2=$(pwd)" >> "$HOME/.bash_volatile_exports"
 
-			# Only the runtime env of the subshell is modified:
-			source "$HOME/.bash_volatile_exports"
+      # Only the runtime env of the subshell is modified:
+      source "$HOME/.bash_volatile_exports"
 
-			ln -s \$$2 "$MARKPATH/$3"
+      ln -s \$$2 "$MARKPATH/$3"
 
-		elif [ -e "$MARKPATH/$1" ]; then
-			ln -s "$MARKPATH/$1" "$MARKPATH/$2"
-		else
-			# return "No such mark: $1"
-			echo "No such mark: $1"
-		fi
-	else
-		return "Wrong number of arguments"
-	fi
+    elif [ -e "$MARKPATH/$1" ]; then
+      ln -s "$MARKPATH/$1" "$MARKPATH/$2"
+    else
+      # return "No such mark: $1"
+      echo "No such mark: $1"
+    fi
+  else
+    return "Wrong number of arguments"
+  fi
 }
 
 help () {

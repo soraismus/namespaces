@@ -1,7 +1,11 @@
 set () {
   SETPATH="$(pwd)"
 	
-	mkdir -p "$MARKPATH"
+	if [ -z "$MARKPATH" ]; then
+		exit 1
+	elif [ ! -e "$MARKPATH" ]; then
+	  mkdir -p "$MARKPATH"
+	fi
 
   # The current directory shouldn't traverse $HOME/.marks
 	# Refactor with bash string-processing utilities!

@@ -17,19 +17,19 @@ set () {
   REF="$( ls -iLd "$1" | awk '{print $1}' )"
 
   # If it doesn't already exist, create a new
-  # subdirectory $2 under $TAGDIR.
-  if [ ! -d "$TAGDIR/$2" ]; then
-    mkdir -p "$TAGDIR/$2"
+  # subdirectory $2 under $TAGPATH.
+  if [ ! -d "$TAGPATH/$2" ]; then
+    mkdir -p "$TAGPATH/$2"
   fi
 
-  # If there isn't already a file called $REF in $TAGDIR/$S,
+  # If there isn't already a file called $REF in $TAGPATH/$S,
   # then create a softlink under that name to the file
   # in the current working directory with the name $1.
-  if [ ! -f "$TAGDIR/$2/$REF" ]; then
-    ln -s "$PWD/$1" "$TAGDIR/$2/$REF"
+  if [ ! -f "$TAGPATH/$2/$REF" ]; then
+    ln -s "$PWD/$1" "$TAGPATH/$2/$REF"
     echo "  '$1' has been tagged with '$2'"
     exit 0;
-  elif [ "$REF" = "$(inode "$TAGDIR/$2/$REF")" ]; then
+  elif [ "$REF" = "$(inode "$TAGPATH/$2/$REF")" ]; then
     echo "  '$1' has already been tagged with '$2'"
     exit 3;
   else
@@ -38,10 +38,10 @@ set () {
   fi
 }
 
-# Echoing the output of `ls "$TAGDIR" lists the
+# Echoing the output of `ls "$TAGPATH" lists the
 # names of all tags currently provided.
 all () {
-  echo "$(ls "$TAGDIR")"
+  echo "$(ls "$TAGPATH")"
   exit 0;
 }
 
@@ -56,7 +56,7 @@ delete () {
     # The backslash escapes the semicolon to prevent shell expansion.
     
     # The next two lines still require explication.
-    ALL_FILES="$(find "$TAGDIR/$1" -maxdepth 1 -exec echo \; | wc -l)"
+    ALL_FILES="$(find "$TAGPATH/$1" -maxdepth 1 -exec echo \; | wc -l)"
     NUM_ITEMS="$(echo "$ALL_FILES" - 1 | bc -l)"
 
     echo "
@@ -66,7 +66,7 @@ This tag currently applies to $NUM_ITEMS items."
     read RESPONSE
 
     if [[ "$RESPONSE" == 'y' ]]; then
-      rm -rf "$TAGDIR/$1"
+      rm -rf "$TAGPATH/$1"
       echo "The tag '$1' has been deleted."
       exit 0;
     else
@@ -86,7 +86,10 @@ list () {
     # -F: The field-separator is '/'.
     # $NF: the total number of fields in the input record.
     # List all entries using the format: filename -> full-filepath
-    echo "$(ls -l "$TAGDIR/$1" | awk '!/total/ {print $11}' | awk -F'/' '{printf("%-10s  ->  %s\n", $NF, $0)}' )"
+    echo "$(ls -l "$TAGPATH/$1"   | \
+      awk '!/total/ {print $11}' | \
+      awk -F'/' '{printf("%-10s  ->  %s\n", $NF, $0)}' )"
+
     exit 0;
   fi
 }
@@ -99,8 +102,8 @@ unset () {
     exit 1;
   fi
 
-  if [ -z "$TAGDIR" ]; then
-    echo "  The variable TAGDIR has not been set to '$HOME/.tags' or exported"
+  if [ -z "$TAGPATH" ]; then
+    echo "  The variable TAGPATH has not been set to '$HOME/.tags' or exported"
     exit 2;
   fi
 
@@ -109,12 +112,12 @@ unset () {
 
   if [[ "$1" = --all ]]; then
     REF="$( ls -iLd "$2" | awk '{print $1}' )"
-    find "$TAGDIR" -name "$REF" -delete
+    find "$TAGPATH" -name "$REF" -delete
     echo "  All tags for '$2' have been deleted"
     exit 0;
   else
     REF="$( ls -iLd "$1" | awk '{print $1}' )"
-    rm "$TAGDIR/$2/$REF"
+    rm "$TAGPATH/$2/$REF"
     echo " The tag '$2' no longer applies to '$1'"
     exit 0;
   fi

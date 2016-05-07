@@ -34,6 +34,10 @@ check-directory () {
       echo -e "$NOTE\n  <-- $FILE"
     fi
   done
+  NOTE="$(read .)"
+  if [ -n "$NOTE" ]; then
+    echo -e "$NOTE\n <-- this directory"
+  fi
 }
 
 get-file-id () {

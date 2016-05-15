@@ -22,11 +22,11 @@ set () {
     mkdir -p "$TAGPATH/$2"
   fi
 
-  # If there isn't already a file called $REF in $TAGPATH/$S,
+  # If there isn't already a file called $REF in $TAGPATH/$2,
   # then create a softlink under that name to the file
   # in the current working directory with the name $1.
   if [ ! -f "$TAGPATH/$2/$REF" ]; then
-    ln -s "$PWD/$1" "$TAGPATH/$2/$REF"
+    ln -s "$1" "$TAGPATH/$2/$REF"
     echo "  '$1' has been tagged with '$2'"
     exit 0;
   elif [ "$REF" = "$(inode "$TAGPATH/$2/$REF")" ]; then
